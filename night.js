@@ -1,12 +1,15 @@
+
 var $form = $('#payment-form');
 $form.find('.subscribe').on('click', payWithStripe);
 
 /* If you're using Stripe for payments */
+
 function payWithStripe(e) {
     e.preventDefault();
     
     /* Abort if invalid form data */
     if (!validator.form()) {
+     //   alert("krkrk");
         return;
     }
 
@@ -24,7 +27,7 @@ function payWithStripe(e) {
         exp_month: expiry.month, 
         exp_year: expiry.year
     };
-    
+
     Stripe.card.createToken(ccData, function stripeResponseHandler(status, response) {
         if (response.error) {
             /* Visual feedback */
@@ -59,31 +62,11 @@ function payWithStripe(e) {
         }
     });
 }
-/* Fancy restrictive input formatting via jQuery.payment library*/
-$('input[name=cardNumber]').payment('formatCardNumber');
-$('input[name=cardCVC]').payment('formatCardCVC');
-$('input[name=cardExpiry').payment('formatCardExpiry');
-
-/* Form validation using Stripe client-side validation helpers */
-jQuery.validator.addMethod("cardNumber", function(value, element) {
-    return this.optional(element) || Stripe.card.validateCardNumber(value);
-}, "Please specify a valid credit card number.");
-
-jQuery.validator.addMethod("cardExpiry", function(value, element) {    
-    /* Parsing month/year uses jQuery.payment library */
-    value = $.payment.cardExpiryVal(value);
-    return this.optional(element) || Stripe.card.validateExpiry(value.month, value.year);
-}, "Invalid expiration date.");
-
-jQuery.validator.addMethod("cardCVC", function(value, element) {
-    return this.optional(element) || Stripe.card.validateCVC(value);
-}, "Invalid CVC.");
-
-validator = $form.validate({
+var validator = $form.validate({
     rules: {
         cardNumber: {
             required: true,
-            cardNumber: true            
+            cardNumber: true
         },
         cardExpiry: {
             required: true,
@@ -104,6 +87,27 @@ validator = $form.validate({
         $(element).closest('.form-group').append(error);
     }
 });
+/* Fancy restrictive input formatting via jQuery.payment library*/
+$('input[name=cardNumber]').payment('formatCardNumber');
+$('input[name=cardCVC]').payment('formatCardCVC');
+$('input[name=cardExpiry').payment('formatCardExpiry');
+
+/* Form validation using Stripe client-side validation helpers */
+jQuery.validator.addMethod("cardNumber", function(value, element) {
+    return this.optional(element) || Stripe.card.validateCardNumber(value);
+}, "Please specify a valid credit card number.");
+
+jQuery.validator.addMethod("cardExpiry", function(value, element) {    
+    /* Parsing month/year uses jQuery.payment library */
+    value = $.payment.cardExpiryVal(value);
+    return this.optional(element) || Stripe.card.validateExpiry(value.month, value.year);
+}, "Invalid expiration date.");
+
+jQuery.validator.addMethod("cardCVC", function(value, element) {
+    return this.optional(element) || Stripe.card.validateCVC(value);
+}, "Invalid CVC.");
+
+
 
 paymentFormReady = function() {
     if ($form.find('[name=cardNumber]').hasClass("success") &&
